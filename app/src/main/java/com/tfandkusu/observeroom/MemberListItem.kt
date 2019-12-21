@@ -1,3 +1,3 @@
 package com.tfandkusu.observeroom
 
-data class MemberListItem(val id: Long, val name: String, val categoryName: String)
+data class MemberListItem(val id: Long, val memberName: String, val divisionName: String)

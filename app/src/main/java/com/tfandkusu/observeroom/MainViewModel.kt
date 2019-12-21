@@ -22,7 +22,7 @@ class MainViewModel : ViewModel() {
         progress.value = true
     }
 
-    lateinit var db: MemberDatabase
+    private lateinit var db: MemberDatabase
 
     fun onCreate(context: Context) = GlobalScope.launch(Dispatchers.Main) {
         // 初期データを加える
@@ -48,7 +48,11 @@ class MainViewModel : ViewModel() {
                 }
             }
         }
-
+        // リスト表示用のデータを取得する
+        val list = db.memberDao().listMembers()
+        items.value = list.map { MemberListItem(it.member.id, it.member.name, it.division.name) }
+        // 読み込み完了
+        progress.value = false
     }
 
 
