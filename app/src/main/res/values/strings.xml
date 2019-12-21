@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ObserveRoom</string>
+    <string name="title_main">Member List</string>
 </resources>

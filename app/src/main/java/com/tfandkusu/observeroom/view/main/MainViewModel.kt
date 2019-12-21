@@ -1,4 +1,4 @@
-package com.tfandkusu.observeroom
+package com.tfandkusu.observeroom.view.main
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
@@ -50,7 +50,13 @@ class MainViewModel : ViewModel() {
         }
         // リスト表示用のデータを取得する
         val list = db.memberDao().listMembers()
-        items.value = list.map { MemberListItem(it.member.id, it.member.name, it.division.name) }
+        items.value = list.map {
+            MemberListItem(
+                it.member.id,
+                it.member.name,
+                it.division.name
+            )
+        }
         // 読み込み完了
         progress.value = false
     }

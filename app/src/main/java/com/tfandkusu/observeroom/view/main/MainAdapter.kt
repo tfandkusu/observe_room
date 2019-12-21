@@ -1,10 +1,11 @@
-package com.tfandkusu.observeroom
+package com.tfandkusu.observeroom.view.main
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.tfandkusu.observeroom.R
 
 class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -21,7 +22,13 @@ class MainAdapter : RecyclerView.Adapter<MainViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return MainViewHolder(inflater.inflate(R.layout.main_list_item, parent, false))
+        return MainViewHolder(
+            inflater.inflate(
+                R.layout.main_list_item,
+                parent,
+                false
+            )
+        )
     }
 
     override fun getItemCount(): Int {
