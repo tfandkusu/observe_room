@@ -9,6 +9,9 @@ import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberDatabase
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
@@ -18,6 +21,8 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
     val items = MutableLiveData<List<MemberListItem>>()
 
     val progress = MutableLiveData<Boolean>()
+
+    var disposable: Disposable? = null
 
     init {
         progress.value = true
@@ -65,6 +70,25 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                 }
                 // ここは実行されない
             }
+        } else if (false) {
+            // RxJavaのFlowableで監視
+            if (disposable == null) {
+                val flowable = db.memberDao().listMembersRxFlowable()
+                disposable = flowable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        items.value = it.map { src ->
+                            MemberListItem(
+                                src.member.id,
+                                src.member.name,
+                                src.division.name
+                            )
+                        }
+                        // 読み込み完了
+                        progress.value = false
+                        Log.d("ObserveRoom", "flowable.subscribe")
+                    }
+            }
         } else {
             // 監視なし
             val list = db.memberDao().listMembers()
@@ -78,4 +102,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         }
     }
 
+    override fun onCleared() {
+        disposable?.dispose()
+    }
 }
