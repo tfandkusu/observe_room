@@ -9,6 +9,7 @@ import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val db: MemberDatabase) : ViewModel() {
@@ -44,17 +45,33 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
             }
         }
         // リスト表示用のデータを取得する
-        val list = db.memberDao().listMembers()
-        items.value = list.map {
-            MemberListItem(
-                it.member.id,
-                it.member.name,
-                it.division.name
-            )
+        if (true) {
+            // Coroutine Flowで監視
+            val flow = db.memberDao().listMembersCoroutineFlow()
+            launch {
+                flow.collect {
+                    items.value = it.map { src ->
+                        MemberListItem(
+                            src.member.id,
+                            src.member.name,
+                            src.division.name
+                        )
+                    }
+                    // 読み込み完了
+                    progress.value = false
+                }
+                // ここは実行されない
+            }
+        } else {
+            // 監視なし
+            val list = db.memberDao().listMembers()
+            items.value = list.map {
+                MemberListItem(
+                    it.member.id,
+                    it.member.name,
+                    it.division.name
+                )
+            }
         }
-        // 読み込み完了
-        progress.value = false
     }
-
-
 }

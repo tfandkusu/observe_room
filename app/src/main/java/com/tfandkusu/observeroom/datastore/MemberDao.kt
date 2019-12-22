@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MemberDao {
@@ -27,4 +28,7 @@ interface MemberDao {
 
     @Update
     suspend fun update(member: Member)
+
+    @Query("SELECT * FROM member ORDER BY member.name")
+    fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>>
 }
