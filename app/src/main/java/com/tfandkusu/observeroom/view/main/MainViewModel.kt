@@ -1,6 +1,5 @@
 package com.tfandkusu.observeroom.view.main
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.room.withTransaction
@@ -8,12 +7,11 @@ import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberDatabase
-import com.tfandkusu.observeroom.datastore.MemberDatabaseFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val db: MemberDatabase) : ViewModel() {
     val items = MutableLiveData<List<MemberListItem>>()
 
     val progress = MutableLiveData<Boolean>()
@@ -22,11 +20,8 @@ class MainViewModel : ViewModel() {
         progress.value = true
     }
 
-    private lateinit var db: MemberDatabase
-
-    fun onCreate(context: Context) = GlobalScope.launch(Dispatchers.Main) {
+    fun onCreate() = GlobalScope.launch(Dispatchers.Main) {
         // 初期データを加える
-        db = MemberDatabaseFactory.get(context)
         db.withTransaction {
             val dao = db.memberDao()
             if (null == dao.firstMember()) {

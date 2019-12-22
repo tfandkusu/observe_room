@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">ObserveRoom</string>
     <string name="title_main">Member List</string>
+    <string name="title_edit">Edit Member</string>
+    <string name="save">Save</string>
+    <string name="member_name">Member Name</string>
 </resources>

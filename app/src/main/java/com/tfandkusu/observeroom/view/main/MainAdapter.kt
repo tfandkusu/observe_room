@@ -16,7 +16,11 @@ class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 }
 
 
-class MainAdapter : RecyclerView.Adapter<MainViewHolder>() {
+class MainAdapter(private val listener: Listener) : RecyclerView.Adapter<MainViewHolder>() {
+
+    interface Listener {
+        fun onItemClick(item: MemberListItem)
+    }
 
     val items = mutableListOf<MemberListItem>()
 
@@ -39,5 +43,8 @@ class MainAdapter : RecyclerView.Adapter<MainViewHolder>() {
         val item = items[position]
         holder.divisionView.text = item.divisionName
         holder.memberView.text = item.memberName
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(item)
+        }
     }
 }
