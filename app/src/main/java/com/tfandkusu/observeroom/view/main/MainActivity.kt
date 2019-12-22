@@ -2,11 +2,13 @@ package com.tfandkusu.observeroom.view.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
+import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -49,5 +51,12 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, EditActivity::class.java)
         intent.putExtras(EditActivity.createCallBundle(item.id))
         startActivity(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("ObserveRoom", "onDestroy")
+        val intent = Intent(this, DisposeTestService::class.java)
+        startService(intent)
     }
 }

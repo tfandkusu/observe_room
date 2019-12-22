@@ -1,7 +1,9 @@
 package com.tfandkusu.observeroom.view.main
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
@@ -48,7 +50,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         if (true) {
             // Coroutine Flowで監視
             val flow = db.memberDao().listMembersCoroutineFlow()
-            launch {
+            viewModelScope.launch {
                 flow.collect {
                     items.value = it.map { src ->
                         MemberListItem(
@@ -59,6 +61,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                     }
                     // 読み込み完了
                     progress.value = false
+                    Log.d("ObserveRoom", "flow.collect")
                 }
                 // ここは実行されない
             }
@@ -74,4 +77,5 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
             }
         }
     }
+
 }

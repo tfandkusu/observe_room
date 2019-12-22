@@ -44,7 +44,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     // ViewModel and LiveData
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
 
     // Room
