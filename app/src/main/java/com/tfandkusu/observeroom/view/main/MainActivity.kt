@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         })
-        viewModel.onCreate()
+        viewModel.onCreate(this)
     }
 
     private fun callEditActivity(item: MemberListItem) {

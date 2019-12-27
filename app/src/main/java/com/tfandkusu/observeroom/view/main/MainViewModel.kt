@@ -1,9 +1,7 @@
 package com.tfandkusu.observeroom.view.main
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
@@ -28,7 +26,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         progress.value = true
     }
 
-    fun onCreate() = GlobalScope.launch(Dispatchers.Main) {
+    fun onCreate(lifecycleOwner: LifecycleOwner) = GlobalScope.launch(Dispatchers.Main) {
         // 初期データを加える
         db.withTransaction {
             val dao = db.memberDao()
@@ -52,7 +50,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
             }
         }
         // リスト表示用のデータを取得する
-        if (true) {
+        if (false) {
             // Coroutine Flowで監視
             val flow = db.memberDao().listMembersCoroutineFlow()
             viewModelScope.launch {
@@ -89,6 +87,23 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                         Log.d("ObserveRoom", "flowable.subscribe")
                     }
             }
+        } else if (true) {
+            // LiveDataで監視
+            val liveData = db.memberDao().listMembersLiveData()
+            liveData.observe(lifecycleOwner, Observer { src ->
+                src?.let {
+                    items.value = it.map { srcItem ->
+                        MemberListItem(
+                            srcItem.member.id,
+                            srcItem.member.name,
+                            srcItem.division.name
+                        )
+                    }
+                }
+                // 読み込み完了
+                progress.value = false
+                Log.d("ObserveRoom", "LiveData observer")
+            })
         } else {
             // 監視なし
             val list = db.memberDao().listMembers()
