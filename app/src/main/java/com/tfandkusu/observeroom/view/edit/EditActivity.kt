@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateViewModelFactory
 import com.tfandkusu.observeroom.R
 import kotlinx.android.synthetic.main.activity_edit.*
-import org.koin.android.viewmodel.ext.android.viewModel
 
 class EditActivity : AppCompatActivity() {
 
@@ -24,12 +26,13 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
-    private val viewModel by viewModel(EditViewModel::class)
+    private val viewModel by viewModels<EditViewModel> {
+        SavedStateViewModelFactory(application, this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
-
         viewModel.progress.observe(this, Observer { flag ->
             flag?.let {
                 if (it) {
@@ -56,6 +59,14 @@ class EditActivity : AppCompatActivity() {
                     }
                 }
                 division.adapter = adapter
+                division.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
+                    }
+
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, id: Long) {
+                        viewModel.selectedDivisionId.value = id
+                    }
+                }
                 division.setSelection(it.divisions.indexOfFirst { division -> division.id == it.selectedId })
             }
         })
@@ -87,10 +98,4 @@ class EditActivity : AppCompatActivity() {
         return false
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        // 状態保存
-        viewModel.selectedDivisionId = division.selectedItemId
-        viewModel.inputName = name.text.toString()
-    }
 }
