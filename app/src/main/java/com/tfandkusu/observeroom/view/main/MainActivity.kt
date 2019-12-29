@@ -45,6 +45,11 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         })
+        viewModel.scroll.observe(this, Observer { index ->
+            index?.let {
+                list.scrollToPosition(it)
+            }
+        })
         viewModel.onCreate(this)
     }
 
@@ -56,8 +61,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("ObserveRoom", "onDestroy")
-        val intent = Intent(this, DisposeTestService::class.java)
-        startService(intent)
+        if (isFinishing) {
+            Log.d("ObserveRoom", "onDestroy")
+            val intent = Intent(this, DisposeTestService::class.java)
+            startService(intent)
+        }
     }
 }

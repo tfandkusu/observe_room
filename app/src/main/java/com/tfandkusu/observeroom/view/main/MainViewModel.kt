@@ -1,12 +1,15 @@
 package com.tfandkusu.observeroom.view.main
 
 import android.util.Log
+import android.util.LongSparseArray
+import androidx.core.util.set
 import androidx.lifecycle.*
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberDatabase
+import com.tfandkusu.observeroom.util.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -20,6 +23,11 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
     val progress = MutableLiveData<Boolean>()
 
     var disposable: Disposable? = null
+
+    /**
+     * スクロール位置
+     */
+    val scroll = SingleLiveEvent<Int>()
 
     init {
         progress.value = true
@@ -50,6 +58,26 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         }
         // リスト表示用のデータを取得する
         if (true) {
+            // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
+            val flow = db.memberDao().listMembersCoroutineFlow()
+            flow.collect {
+                var oldList = items.value ?: listOf()
+                val newList = it.map { src ->
+                    MemberListItem(
+                        src.member.id,
+                        src.member.name,
+                        src.division.name
+                    )
+                }
+                items.value = newList
+                // 読み込み完了
+                progress.value = false
+                // スクロール
+                updateScroll(oldList, newList)
+                Log.d("ObserveRoom", "flow.collect")
+            }
+            // ここは実行されない
+        } else if (false) {
             // Coroutine Flowで監視
             val flow = db.memberDao().listMembersCoroutineFlow()
             flow.collect {
@@ -62,6 +90,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                 }
                 // 読み込み完了
                 progress.value = false
+                // スクロール
                 Log.d("ObserveRoom", "flow.collect")
             }
             // ここは実行されない
@@ -116,5 +145,27 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
 
     override fun onCleared() {
         disposable?.dispose()
+    }
+
+    /**
+     * スクロール位置を更新された場所にする
+     */
+    private fun updateScroll(oldList: List<MemberListItem>, newList: List<MemberListItem>) {
+        if (oldList.isEmpty())
+            return
+        // idのマップにする
+        val map = LongSparseArray<MemberListItem>()
+        oldList.map { map[it.id] = it }
+        // 更新された項目を探す
+        var scrollIndex = 0
+        newList.mapIndexed { index, item ->
+            val oldItem = map.get(item.id)
+            if (oldItem != item) {
+                // 古いものと違う場合は、その場所にスクロールする
+                scrollIndex = index
+            }
+        }
+        Log.d("ObserveRoom", "scroll.value = $scrollIndex")
+        scroll.value = scrollIndex
     }
 }
