@@ -45,7 +45,7 @@ class MainViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
     }
 
     fun onCreate(lifecycleOwner: LifecycleOwner) = viewModelScope.launch(Dispatchers.Main) {
-        // 初期データを加える
+        // 初期データを書き込む
         db.withTransaction {
             val dao = db.memberDao()
             if (null == dao.firstMember()) {
@@ -89,6 +89,7 @@ class MainViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
                     Log.d("ObserveRoom", "scroll.value = $index")
                     saveScroll.value = null
                 }
+                // 編集が行われた時はその場所にスクロールする
                 updateScroll(oldList, newList)
                 Log.d("ObserveRoom", "flow.collect")
             }

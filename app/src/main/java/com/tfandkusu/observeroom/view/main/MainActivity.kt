@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
                     progress.visibility = View.GONE
             }
         })
+        // RecyclerViewの設定
         val adapter = MainAdapter(object : MainAdapter.Listener {
             override fun onItemClick(item: MemberListItem) {
                 callEditActivity(item)
@@ -48,15 +49,21 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         })
+        // スクロール位置の設定
         viewModel.scroll.observe(this, Observer { index ->
             index?.let {
                 Log.d("ObserveRoom", "scroll scrollToPosition $index")
                 list.scrollToPosition(it)
             }
         })
+        //
         viewModel.onCreate(this)
     }
 
+    /**
+     * 編集画面を開く
+     * @param item リスト項目
+     */
     private fun callEditActivity(item: MemberListItem) {
         val intent = Intent(this, EditActivity::class.java)
         intent.putExtras(EditActivity.createCallBundle(item.id))
@@ -67,6 +74,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         if (isFinishing) {
+            // Roomの購読解除が適切にされているかフォアグランドサービスで確認する
             Log.d("ObserveRoom", "onDestroy")
             val intent = Intent(this, DisposeTestService::class.java)
             startService(intent)
@@ -75,6 +83,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d("ObserveRoom", "onSaveInstanceState")
+        // スクロール位置の保存
         val firstVisiblePositionItem =
             (list.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         viewModel.saveScroll.value = firstVisiblePositionItem
