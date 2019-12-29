@@ -1,9 +1,7 @@
 package com.tfandkusu.observeroom.view.main
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
 import com.tfandkusu.observeroom.datastore.Division
@@ -13,7 +11,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -28,7 +25,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         progress.value = true
     }
 
-    fun onCreate() = GlobalScope.launch(Dispatchers.Main) {
+    fun onCreate(lifecycleOwner: LifecycleOwner) = viewModelScope.launch(Dispatchers.Main) {
         // 初期データを加える
         db.withTransaction {
             val dao = db.memberDao()
@@ -55,21 +52,19 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         if (true) {
             // Coroutine Flowで監視
             val flow = db.memberDao().listMembersCoroutineFlow()
-            viewModelScope.launch {
-                flow.collect {
-                    items.value = it.map { src ->
-                        MemberListItem(
-                            src.member.id,
-                            src.member.name,
-                            src.division.name
-                        )
-                    }
-                    // 読み込み完了
-                    progress.value = false
-                    Log.d("ObserveRoom", "flow.collect")
+            flow.collect {
+                items.value = it.map { src ->
+                    MemberListItem(
+                        src.member.id,
+                        src.member.name,
+                        src.division.name
+                    )
                 }
-                // ここは実行されない
+                // 読み込み完了
+                progress.value = false
+                Log.d("ObserveRoom", "flow.collect")
             }
+            // ここは実行されない
         } else if (false) {
             // RxJavaのFlowableで監視
             if (disposable == null) {
@@ -89,6 +84,23 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                         Log.d("ObserveRoom", "flowable.subscribe")
                     }
             }
+        } else if (false) {
+            // LiveDataで監視
+            val liveData = db.memberDao().listMembersLiveData()
+            liveData.observe(lifecycleOwner, Observer { src ->
+                src?.let {
+                    items.value = it.map { srcItem ->
+                        MemberListItem(
+                            srcItem.member.id,
+                            srcItem.member.name,
+                            srcItem.division.name
+                        )
+                    }
+                }
+                // 読み込み完了
+                progress.value = false
+                Log.d("ObserveRoom", "LiveData observer")
+            })
         } else {
             // 監視なし
             val list = db.memberDao().listMembers()

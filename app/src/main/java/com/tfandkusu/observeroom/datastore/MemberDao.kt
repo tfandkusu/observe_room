@@ -1,5 +1,6 @@
 package com.tfandkusu.observeroom.datastore
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -35,4 +36,7 @@ interface MemberDao {
 
     @Query("SELECT * FROM member ORDER BY member.name")
     fun listMembersRxFlowable(): Flowable<List<MemberWithDivision>>
+
+    @Query("SELECT * FROM member ORDER BY member.name")
+    fun listMembersLiveData(): LiveData<List<MemberWithDivision>>
 }
