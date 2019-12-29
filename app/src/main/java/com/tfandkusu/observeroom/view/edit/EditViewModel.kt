@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberDatabase
+import com.tfandkusu.observeroom.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -54,7 +55,7 @@ class EditViewModel(private val handle: SavedStateHandle) : ViewModel(), KoinCom
     /**
      * 終了フラグ
      */
-    val success = MutableLiveData<Boolean>()
+    val success = SingleLiveEvent<Boolean>()
 
     init {
         progress.value = true
