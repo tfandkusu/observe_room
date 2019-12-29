@@ -75,7 +75,6 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
                     }
                     // 読み込み完了
                     progress.value = false
-                    // スクロール
                     Log.d("ObserveRoom", "flow.collect")
                 }
                 // ここは実行されない
