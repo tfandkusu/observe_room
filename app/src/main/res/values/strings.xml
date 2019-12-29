@@ -4,4 +4,8 @@
     <string name="title_edit">Edit Member</string>
     <string name="save">Save</string>
     <string name="member_name">Member Name</string>
+    <string name="channel_name">Main</string>
+    <string name="channel_id">main</string>
+    <string name="notification_title">ObserveRoom</string>
+    <string name="notification_message">Writing to sqlite</string>
 </resources>

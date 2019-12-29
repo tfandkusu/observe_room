@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tfandkusu.observeroom">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -14,7 +16,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <service
             android:name=".view.disposetest.DisposeTestService"
-            android:exported="false"></service>
+            android:exported="false" />
 
         <activity
             android:name=".view.main.MainActivity"

@@ -13,6 +13,7 @@ import com.tfandkusu.observeroom.view.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
+
 class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModel(MainViewModel::class)
