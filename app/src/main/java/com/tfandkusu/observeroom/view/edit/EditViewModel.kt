@@ -16,21 +16,9 @@ import org.koin.core.inject
 
 data class DivisionsAndSelectedId(val divisions: List<Division>, val selectedId: Long)
 
-class EditViewModel(private val handle: SavedStateHandle) : ViewModel(), KoinComponent {
+class EditViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
 
     private val db: MemberDatabase by inject()
-
-    companion object {
-        /**
-         * 入力された名前
-         */
-        private const val EXTRA_INPUT_NAME = "inputName"
-
-        /**
-         * 選択された部署のID
-         */
-        private const val EXTRA_SELECTED_DIVISION_ID = "selectedDivisionId"
-    }
 
     /**
      * プログレス
@@ -45,12 +33,12 @@ class EditViewModel(private val handle: SavedStateHandle) : ViewModel(), KoinCom
     /**
      * 選択された部署ID
      */
-    val selectedDivisionId = handle.getLiveData<Long>(EXTRA_SELECTED_DIVISION_ID)
+    val selectedDivisionId = handle.getLiveData<Long>("selectedDivisionId")
 
     /**
      * メンバー名
      */
-    val name = handle.getLiveData<String>(EXTRA_INPUT_NAME)
+    val name = handle.getLiveData<String>("inputName")
 
     /**
      * 終了フラグ

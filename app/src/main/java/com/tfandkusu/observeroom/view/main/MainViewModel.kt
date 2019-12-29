@@ -16,16 +16,27 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 
-class MainViewModel(private val db: MemberDatabase) : ViewModel() {
+class MainViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
+
+    private val db: MemberDatabase by inject()
+
     val items = MutableLiveData<List<MemberListItem>>()
 
     val progress = MutableLiveData<Boolean>()
 
     var disposable: Disposable? = null
 
+
     /**
-     * スクロール位置
+     * 保存されたスクロール位置
+     */
+    val saveScroll = handle.getLiveData<Int>("scroll")
+
+    /**
+     * スクロール位置制御
      */
     val scroll = SingleLiveEvent<Int>()
 
@@ -61,7 +72,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
             // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
             val flow = db.memberDao().listMembersCoroutineFlow()
             flow.collect {
-                var oldList = items.value ?: listOf()
+                val oldList = items.value ?: listOf()
                 val newList = it.map { src ->
                     MemberListItem(
                         src.member.id,
@@ -72,7 +83,12 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
                 items.value = newList
                 // 読み込み完了
                 progress.value = false
-                // スクロール
+                // スクロール位置復帰
+                saveScroll.value?.let { index ->
+                    scroll.value = index
+                    Log.d("ObserveRoom", "scroll.value = $index")
+                    saveScroll.value = null
+                }
                 updateScroll(oldList, newList)
                 Log.d("ObserveRoom", "flow.collect")
             }
@@ -157,7 +173,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
         val map = LongSparseArray<MemberListItem>()
         oldList.map { map[it.id] = it }
         // 更新された項目を探す
-        var scrollIndex = 0
+        var scrollIndex = -1
         newList.mapIndexed { index, item ->
             val oldItem = map.get(item.id)
             if (oldItem != item) {
@@ -166,6 +182,7 @@ class MainViewModel(private val db: MemberDatabase) : ViewModel() {
             }
         }
         Log.d("ObserveRoom", "scroll.value = $scrollIndex")
-        scroll.value = scrollIndex
+        if (scrollIndex >= 0)
+            scroll.value = scrollIndex
     }
 }

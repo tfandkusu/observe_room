@@ -4,19 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel by viewModel(MainViewModel::class)
+    private val viewModel by viewModels<MainViewModel> {
+        SavedStateViewModelFactory(application, this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.scroll.observe(this, Observer { index ->
             index?.let {
+                Log.d("ObserveRoom", "scroll scrollToPosition $index")
                 list.scrollToPosition(it)
             }
         })
@@ -59,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         if (isFinishing) {
@@ -66,5 +71,13 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, DisposeTestService::class.java)
             startService(intent)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d("ObserveRoom", "onSaveInstanceState")
+        val firstVisiblePositionItem =
+            (list.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+        viewModel.saveScroll.value = firstVisiblePositionItem
+        super.onSaveInstanceState(outState)
     }
 }
