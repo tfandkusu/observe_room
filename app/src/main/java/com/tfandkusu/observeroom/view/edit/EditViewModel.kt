@@ -1,24 +1,21 @@
 package com.tfandkusu.observeroom.view.edit
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
-import com.tfandkusu.observeroom.datastore.MemberDatabase
+import com.tfandkusu.observeroom.datastore.MemberDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 
 
 data class DivisionsAndSelectedId(val divisions: List<Division>, val selectedId: Long)
 
-class EditViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
+class EditViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinComponent {
 
-    private val db: MemberDatabase by inject()
 
     /**
      * プログレス
@@ -31,14 +28,14 @@ class EditViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
     val divisions = MutableLiveData<DivisionsAndSelectedId>()
 
     /**
-     * 選択された部署ID
+     * 選択された部署ID(savedInstanceStateにする)
      */
-    val selectedDivisionId = handle.getLiveData<Long>("selectedDivisionId")
+    var selectedDivisionId = 0L
 
     /**
-     * メンバー名
+     * メンバー名(savedInstanceStateに保存する)
      */
-    val name = handle.getLiveData<String>("inputName")
+    val name = MutableLiveData<String>()
 
     /**
      * 終了フラグ
@@ -54,18 +51,17 @@ class EditViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
      * @param id
      */
     fun onCreate(id: Long) = GlobalScope.launch(Dispatchers.Main) {
-        val dao = db.memberDao()
-        val divisionsList = dao.listDivisions()
-        val member = dao.get(id)
+        val divisionsList = dataStore.listDivisions()
+        val member = dataStore.get(id)
         member?.let {
-            if (selectedDivisionId.value == null) {
+            if (selectedDivisionId == 0L) {
                 // 初回ケース
                 divisions.value = DivisionsAndSelectedId(divisionsList, it.division.id)
-                selectedDivisionId.value = it.division.id
+                selectedDivisionId = it.division.id
             } else {
                 // 画面復帰ケース
                 divisions.value =
-                    DivisionsAndSelectedId(divisionsList, selectedDivisionId.value ?: 0)
+                    DivisionsAndSelectedId(divisionsList, selectedDivisionId)
             }
             if (name.value == null) {
                 // 初回ケース
@@ -80,9 +76,8 @@ class EditViewModel(handle: SavedStateHandle) : ViewModel(), KoinComponent {
      */
     fun save(id: Long, name: String, divisionId: Long) = GlobalScope.launch(Dispatchers.Main) {
         progress.value = true
-        val dao = db.memberDao()
         val member = Member(id, name, divisionId)
-        dao.update(member)
+        dataStore.update(member)
         success.value = true
     }
 

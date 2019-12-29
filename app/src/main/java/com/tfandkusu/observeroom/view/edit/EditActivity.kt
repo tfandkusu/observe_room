@@ -6,12 +6,11 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.SavedStateViewModelFactory
 import com.tfandkusu.observeroom.R
 import kotlinx.android.synthetic.main.activity_edit.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class EditActivity : AppCompatActivity() {
 
@@ -24,15 +23,21 @@ class EditActivity : AppCompatActivity() {
             bundle.putLong(EXTRA_ID, id)
             return bundle
         }
+
+        private const val EXTRA_NAME = "name"
+
+        private const val EXTRA_SELECTED_DIVISION_ID = "selectedDivisionId"
     }
 
-    private val viewModel by viewModels<EditViewModel> {
-        SavedStateViewModelFactory(application, this)
-    }
+    private val viewModel: EditViewModel by viewModel()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
+        viewModel.name.value = savedInstanceState?.getString(EXTRA_NAME)
+        viewModel.selectedDivisionId = savedInstanceState?.getLong(EXTRA_SELECTED_DIVISION_ID) ?: 0L
+
         viewModel.progress.observe(this, Observer { flag ->
             flag?.let {
                 if (it) {
@@ -64,7 +69,7 @@ class EditActivity : AppCompatActivity() {
                     }
 
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, id: Long) {
-                        viewModel.selectedDivisionId.value = id
+                        viewModel.selectedDivisionId = id
                     }
                 }
                 division.setSelection(it.divisions.indexOfFirst { division -> division.id == it.selectedId })
@@ -98,4 +103,9 @@ class EditActivity : AppCompatActivity() {
         return false
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(EXTRA_NAME, name.text.toString())
+        outState.putLong(EXTRA_SELECTED_DIVISION_ID, viewModel.selectedDivisionId)
+        super.onSaveInstanceState(outState)
+    }
 }

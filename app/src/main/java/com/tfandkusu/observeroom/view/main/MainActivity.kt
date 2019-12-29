@@ -4,21 +4,25 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.viewmodel.ext.android.viewModel
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel by viewModels<MainViewModel> {
-        SavedStateViewModelFactory(application, this)
+    private val viewModel: MainViewModel by viewModel()
+
+    companion object {
+        /**
+         * スクロール位置
+         */
+        private const val EXTRA_SCROLL = "scroll"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,8 +60,7 @@ class MainActivity : AppCompatActivity() {
                 list.scrollToPosition(it)
             }
         })
-        //
-        viewModel.onCreate(this)
+        viewModel.onCreate(this, savedInstanceState?.getInt(EXTRA_SCROLL))
     }
 
     /**
@@ -86,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         // スクロール位置の保存
         val firstVisiblePositionItem =
             (list.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-        viewModel.saveScroll.value = firstVisiblePositionItem
+        outState.putInt(EXTRA_SCROLL, firstVisiblePositionItem)
         super.onSaveInstanceState(outState)
     }
 }
