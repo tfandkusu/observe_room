@@ -4,7 +4,7 @@ import android.util.Log
 import android.util.LongSparseArray
 import androidx.core.util.set
 import androidx.lifecycle.*
-import com.tfandkusu.observeroom.datastore.MemberDataStore
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +30,7 @@ enum class ObserveMode {
     LIVE_DATA
 }
 
-class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinComponent {
+class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel(), KoinComponent {
 
     var mode = ObserveMode.COROUTINE_FLOW
 
@@ -53,13 +53,13 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
     fun onCreate(lifecycleOwner: LifecycleOwner, savedScroll: Int?) =
         viewModelScope.launch(Dispatchers.Main) {
             // 初期データを書き込む
-            dataStore.makeFixture()
+            localDataStore.makeFixture()
             // リスト表示用のデータを取得する
             when (mode) {
                 ObserveMode.COROUTINE_FLOW -> {
                     if (true) {
                         // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
-                        val flow = dataStore.listMembersCoroutineFlow()
+                        val flow = localDataStore.listMembersCoroutineFlow()
                         flow.collect {
                             val oldList = items.value ?: listOf()
                             val newList = it.map { src ->
@@ -84,7 +84,7 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
                         // ここは実行されない
                     } else {
                         // Coroutine Flowで監視
-                        val flow = dataStore.listMembersCoroutineFlow()
+                        val flow = localDataStore.listMembersCoroutineFlow()
                         flow.collect {
                             items.value = it.map { src ->
                                 MemberListItem(
@@ -103,7 +103,7 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
                 ObserveMode.RX_JAVA -> {
                     // RxJavaのFlowableで監視
                     if (disposable == null) {
-                        val flowable = dataStore.listMembersRxFlowable()
+                        val flowable = localDataStore.listMembersRxFlowable()
                         disposable = flowable.subscribe({
                             items.value = it.map { src ->
                                 MemberListItem(
@@ -122,7 +122,7 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
                 }
                 ObserveMode.LIVE_DATA -> {
                     // LiveDataで監視
-                    val liveData = dataStore.listMembersLiveData()
+                    val liveData = localDataStore.listMembersLiveData()
                     liveData.observe(lifecycleOwner, Observer { src ->
                         src?.let {
                             items.value = it.map { srcItem ->

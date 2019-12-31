@@ -8,7 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 
-interface MemberDataStore {
+interface MemberLocalDataStore {
     /**
      * 初期データ作成
      */
@@ -50,7 +50,7 @@ interface MemberDataStore {
 }
 
 
-class MemberDataStoreImpl(private val db: MemberDatabase) : MemberDataStore {
+class MemberLocalDataStoreImpl(private val db: MemberDatabase) : MemberLocalDataStore {
     override suspend fun makeFixture() {
         db.withTransaction {
             val dao = db.memberDao()

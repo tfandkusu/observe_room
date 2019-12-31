@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
-import com.tfandkusu.observeroom.datastore.MemberDataStore
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -14,7 +14,7 @@ import org.koin.core.KoinComponent
 
 data class DivisionsAndSelectedId(val divisions: List<Division>, val selectedId: Long)
 
-class EditViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinComponent {
+class EditViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel(), KoinComponent {
 
 
     /**
@@ -51,8 +51,8 @@ class EditViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
      * @param id
      */
     fun onCreate(id: Long) = GlobalScope.launch(Dispatchers.Main) {
-        val divisionsList = dataStore.listDivisions()
-        val member = dataStore.get(id)
+        val divisionsList = localDataStore.listDivisions()
+        val member = localDataStore.get(id)
         member?.let {
             if (selectedDivisionId == 0L) {
                 // 初回ケース
@@ -77,7 +77,7 @@ class EditViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
     fun save(id: Long, name: String, divisionId: Long) = GlobalScope.launch(Dispatchers.Main) {
         progress.value = true
         val member = Member(id, name, divisionId)
-        dataStore.update(member)
+        localDataStore.update(member)
         success.value = true
     }
 

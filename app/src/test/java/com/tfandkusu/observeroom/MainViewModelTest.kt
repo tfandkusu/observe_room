@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
-import com.tfandkusu.observeroom.datastore.MemberDataStore
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision
 import com.tfandkusu.observeroom.view.main.MainViewModel
 import com.tfandkusu.observeroom.view.main.MemberListItem
@@ -33,7 +33,7 @@ class MainViewModelTest {
     private lateinit var viewModel: MainViewModel
 
     @MockK(relaxed = true)
-    lateinit var dataStore: MemberDataStore
+    lateinit var localDataStore: MemberLocalDataStore
 
     @MockK(relaxed = true)
     lateinit var lifecycleOwner: LifecycleOwner
@@ -44,7 +44,7 @@ class MainViewModelTest {
     fun setUp() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         MockKAnnotations.init(this)
-        viewModel = MainViewModel(dataStore)
+        viewModel = MainViewModel(localDataStore)
     }
 
     /**
@@ -55,7 +55,7 @@ class MainViewModelTest {
     fun onCreate() = runBlocking {
         // もっとよい書き方がありそう
         coEvery {
-            dataStore.listMembersCoroutineFlow()
+            localDataStore.listMembersCoroutineFlow()
         } returns testFlow(
             listOf(
                 MemberWithDivision(
@@ -90,7 +90,7 @@ class MainViewModelTest {
     @Test
     fun onResultEdit() = runBlocking {
         coEvery {
-            dataStore.listMembersCoroutineFlow()
+            localDataStore.listMembersCoroutineFlow()
         } returns testFlow(
             listOf(
                 MemberWithDivision(
@@ -128,7 +128,7 @@ class MainViewModelTest {
     @Test
     fun onCreateRestart() = runBlocking {
         coEvery {
-            dataStore.listMembersCoroutineFlow()
+            localDataStore.listMembersCoroutineFlow()
         } returns testFlow(
             listOf(
                 MemberWithDivision(
@@ -163,7 +163,7 @@ class MainViewModelTest {
     @Test
     fun onCreateRxJava() = runBlocking {
         every {
-            dataStore.listMembersRxFlowable()
+            localDataStore.listMembersRxFlowable()
         } returns Flowable.just(
             listOf(
                 MemberWithDivision(
@@ -199,7 +199,7 @@ class MainViewModelTest {
     @Test
     fun onCreateLiveData() = runBlocking {
         every {
-            dataStore.listMembersLiveData()
+            localDataStore.listMembersLiveData()
         } returns MutableLiveData<List<MemberWithDivision>>(
             listOf(
                 MemberWithDivision(

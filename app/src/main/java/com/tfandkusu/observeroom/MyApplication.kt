@@ -2,9 +2,9 @@ package com.tfandkusu.observeroom
 
 import android.app.Application
 import androidx.room.Room
-import com.tfandkusu.observeroom.datastore.MemberDataStore
-import com.tfandkusu.observeroom.datastore.MemberDataStoreImpl
 import com.tfandkusu.observeroom.datastore.MemberDatabase
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStoreImpl
 import com.tfandkusu.observeroom.view.edit.EditViewModel
 import com.tfandkusu.observeroom.view.main.MainViewModel
 import org.koin.android.ext.koin.androidContext
@@ -21,7 +21,7 @@ class MyApplication : Application() {
                     .build()
             }
             single {
-                MemberDataStoreImpl(get()) as MemberDataStore
+                MemberLocalDataStoreImpl(get()) as MemberLocalDataStore
             }
             viewModel {
                 MainViewModel(get())
