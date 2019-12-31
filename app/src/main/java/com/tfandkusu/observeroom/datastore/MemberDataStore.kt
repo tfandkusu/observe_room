@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
 import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 
 interface MemberDataStore {
@@ -18,8 +20,15 @@ interface MemberDataStore {
      */
     suspend fun update(member: Member)
 
+    /**
+     * 部署一覧取得
+     */
     suspend fun listDivisions(): List<Division>
 
+    /**
+     * メンバー取得
+     * @param id メンバーのID
+     */
     suspend fun get(id: Long): MemberWithDivision?
 
 
@@ -84,7 +93,8 @@ class MemberDataStoreImpl(private val db: MemberDatabase) : MemberDataStore {
     }
 
     override fun listMembersRxFlowable(): Flowable<List<MemberWithDivision>> {
-        return db.memberDao().listMembersRxFlowable()
+        return db.memberDao().listMembersRxFlowable().subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     override fun listMembersLiveData(): LiveData<List<MemberWithDivision>> {

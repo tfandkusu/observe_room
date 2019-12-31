@@ -6,15 +6,33 @@ import androidx.core.util.set
 import androidx.lifecycle.*
 import com.tfandkusu.observeroom.datastore.MemberDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 
+/**
+ * 更新監視の方法
+ */
+enum class ObserveMode {
+    /**
+     * Coroutine Flowで監視
+     */
+    COROUTINE_FLOW,
+    /**
+     * RxJavaで監視
+     */
+    RX_JAVA,
+    /**
+     * LiveDataで監視
+     */
+    LIVE_DATA
+}
+
 class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinComponent {
+
+    var mode = ObserveMode.COROUTINE_FLOW
 
     val items = MutableLiveData<List<MemberListItem>>()
 
@@ -37,54 +55,56 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
             // 初期データを書き込む
             dataStore.makeFixture()
             // リスト表示用のデータを取得する
-            if (true) {
-                // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
-                val flow = dataStore.listMembersCoroutineFlow()
-                flow.collect {
-                    val oldList = items.value ?: listOf()
-                    val newList = it.map { src ->
-                        MemberListItem(
-                            src.member.id,
-                            src.member.name,
-                            src.division.name
-                        )
+            when (mode) {
+                ObserveMode.COROUTINE_FLOW -> {
+                    if (true) {
+                        // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
+                        val flow = dataStore.listMembersCoroutineFlow()
+                        flow.collect {
+                            val oldList = items.value ?: listOf()
+                            val newList = it.map { src ->
+                                MemberListItem(
+                                    src.member.id,
+                                    src.member.name,
+                                    src.division.name
+                                )
+                            }
+                            items.value = newList
+                            // 読み込み完了
+                            progress.value = false
+                            // スクロール位置復帰
+                            savedScroll?.let { index ->
+                                scroll.value = index
+                                Log.d("ObserveRoom", "scroll.value = $index")
+                            }
+                            // 編集が行われた時はその場所にスクロールする
+                            updateScroll(oldList, newList)
+                            Log.d("ObserveRoom", "flow.collect")
+                        }
+                        // ここは実行されない
+                    } else {
+                        // Coroutine Flowで監視
+                        val flow = dataStore.listMembersCoroutineFlow()
+                        flow.collect {
+                            items.value = it.map { src ->
+                                MemberListItem(
+                                    src.member.id,
+                                    src.member.name,
+                                    src.division.name
+                                )
+                            }
+                            // 読み込み完了
+                            progress.value = false
+                            Log.d("ObserveRoom", "flow.collect")
+                        }
+                        // ここは実行されない
                     }
-                    items.value = newList
-                    // 読み込み完了
-                    progress.value = false
-                    // スクロール位置復帰
-                    savedScroll?.let { index ->
-                        scroll.value = index
-                        Log.d("ObserveRoom", "scroll.value = $index")
-                    }
-                    // 編集が行われた時はその場所にスクロールする
-                    updateScroll(oldList, newList)
-                    Log.d("ObserveRoom", "flow.collect")
                 }
-                // ここは実行されない
-            } else if (false) {
-                // Coroutine Flowで監視
-                val flow = dataStore.listMembersCoroutineFlow()
-                flow.collect {
-                    items.value = it.map { src ->
-                        MemberListItem(
-                            src.member.id,
-                            src.member.name,
-                            src.division.name
-                        )
-                    }
-                    // 読み込み完了
-                    progress.value = false
-                    Log.d("ObserveRoom", "flow.collect")
-                }
-                // ここは実行されない
-            } else if (false) {
-                // RxJavaのFlowableで監視
-                if (disposable == null) {
-                    val flowable = dataStore.listMembersRxFlowable()
-                    disposable = flowable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
+                ObserveMode.RX_JAVA -> {
+                    // RxJavaのFlowableで監視
+                    if (disposable == null) {
+                        val flowable = dataStore.listMembersRxFlowable()
+                        disposable = flowable.subscribe({
                             items.value = it.map { src ->
                                 MemberListItem(
                                     src.member.id,
@@ -95,25 +115,29 @@ class MainViewModel(private val dataStore: MemberDataStore) : ViewModel(), KoinC
                             // 読み込み完了
                             progress.value = false
                             Log.d("ObserveRoom", "flowable.subscribe")
-                        }
-                }
-            } else if (false) {
-                // LiveDataで監視
-                val liveData = dataStore.listMembersLiveData()
-                liveData.observe(lifecycleOwner, Observer { src ->
-                    src?.let {
-                        items.value = it.map { srcItem ->
-                            MemberListItem(
-                                srcItem.member.id,
-                                srcItem.member.name,
-                                srcItem.division.name
-                            )
-                        }
+                        }, {
+                            it.printStackTrace()
+                        })
                     }
-                    // 読み込み完了
-                    progress.value = false
-                    Log.d("ObserveRoom", "LiveData observer")
-                })
+                }
+                ObserveMode.LIVE_DATA -> {
+                    // LiveDataで監視
+                    val liveData = dataStore.listMembersLiveData()
+                    liveData.observe(lifecycleOwner, Observer { src ->
+                        src?.let {
+                            items.value = it.map { srcItem ->
+                                MemberListItem(
+                                    srcItem.member.id,
+                                    srcItem.member.name,
+                                    srcItem.division.name
+                                )
+                            }
+                        }
+                        // 読み込み完了
+                        progress.value = false
+                        Log.d("ObserveRoom", "LiveData observer")
+                    })
+                }
             }
         }
 
