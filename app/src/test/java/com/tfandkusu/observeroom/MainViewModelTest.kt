@@ -15,8 +15,6 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
@@ -54,22 +52,18 @@ class MainViewModelTest {
         // もっとよい書き方がありそう
         coEvery {
             dataStore.listMembersCoroutineFlow()
-        } returns object : Flow<List<MemberWithDivision>> {
-            override suspend fun collect(collector: FlowCollector<List<MemberWithDivision>>) {
-                collector.emit(
-                    listOf(
-                        MemberWithDivision(
-                            Member(1L, "name1", 2L),
-                            Division(2L, "Sales")
-                        ),
-                        MemberWithDivision(
-                            Member(3L, "name2", 4L),
-                            Division(4L, "Development")
-                        )
-                    )
+        } returns testFlow(
+            listOf(
+                MemberWithDivision(
+                    Member(1L, "name1", 2L),
+                    Division(2L, "Sales")
+                ),
+                MemberWithDivision(
+                    Member(3L, "name2", 4L),
+                    Division(4L, "Development")
                 )
-            }
-        }
+            )
+        )
         viewModel.progress.value shouldBe true
         viewModel.onCreate(lifecycleOwner, null).join()
         // リストが更新された
@@ -93,22 +87,18 @@ class MainViewModelTest {
     fun onResultEdit() = runBlocking {
         coEvery {
             dataStore.listMembersCoroutineFlow()
-        } returns object : Flow<List<MemberWithDivision>> {
-            override suspend fun collect(collector: FlowCollector<List<MemberWithDivision>>) {
-                collector.emit(
-                    listOf(
-                        MemberWithDivision(
-                            Member(1L, "name1", 2L),
-                            Division(2L, "Sales")
-                        ),
-                        MemberWithDivision(
-                            Member(3L, "edited", 4L),
-                            Division(5L, "Management")
-                        )
-                    )
+        } returns testFlow(
+            listOf(
+                MemberWithDivision(
+                    Member(1L, "name1", 2L),
+                    Division(2L, "Sales")
+                ),
+                MemberWithDivision(
+                    Member(3L, "edited", 4L),
+                    Division(5L, "Management")
                 )
-            }
-        }
+            )
+        )
         // 戻ってくる前の状態
         viewModel.progress.value = false
         viewModel.items.value = listOf(
@@ -135,22 +125,18 @@ class MainViewModelTest {
     fun onCreateRestart() = runBlocking {
         coEvery {
             dataStore.listMembersCoroutineFlow()
-        } returns object : Flow<List<MemberWithDivision>> {
-            override suspend fun collect(collector: FlowCollector<List<MemberWithDivision>>) {
-                collector.emit(
-                    listOf(
-                        MemberWithDivision(
-                            Member(1L, "name1", 2L),
-                            Division(2L, "Sales")
-                        ),
-                        MemberWithDivision(
-                            Member(3L, "name2", 4L),
-                            Division(4L, "Development")
-                        )
-                    )
+        } returns testFlow(
+            listOf(
+                MemberWithDivision(
+                    Member(1L, "name1", 2L),
+                    Division(2L, "Sales")
+                ),
+                MemberWithDivision(
+                    Member(3L, "name2", 4L),
+                    Division(4L, "Development")
                 )
-            }
-        }
+            )
+        )
         viewModel.progress.value shouldBe true
         viewModel.onCreate(lifecycleOwner, 1).join()
         // リストが更新された
