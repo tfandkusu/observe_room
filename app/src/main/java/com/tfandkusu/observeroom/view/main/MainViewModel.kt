@@ -10,7 +10,6 @@ import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
 
 /**
  * 更新監視の方法
@@ -30,7 +29,7 @@ enum class ObserveMode {
     LIVE_DATA
 }
 
-class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel(), KoinComponent {
+class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel() {
 
     var mode = ObserveMode.COROUTINE_FLOW
 

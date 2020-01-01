@@ -29,6 +29,9 @@ import org.junit.Test
 
 
 class MainViewModelTest {
+    /**
+     * LiveDataを書き換えるのに必要
+     */
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -44,6 +47,7 @@ class MainViewModelTest {
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
+        // スレッドを切り替えない
         Dispatchers.setMain(Dispatchers.Unconfined)
         MockKAnnotations.init(this)
         viewModel = MainViewModel(localDataStore)

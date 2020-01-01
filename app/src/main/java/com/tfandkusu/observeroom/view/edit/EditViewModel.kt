@@ -9,12 +9,11 @@ import com.tfandkusu.observeroom.util.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.koin.core.KoinComponent
 
 
 data class DivisionsAndSelectedId(val divisions: List<Division>, val selectedId: Long)
 
-class EditViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel(), KoinComponent {
+class EditViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel() {
 
 
     /**
