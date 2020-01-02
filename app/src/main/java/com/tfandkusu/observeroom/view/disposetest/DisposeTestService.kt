@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.datastore.Member
-import com.tfandkusu.observeroom.datastore.MemberDatabase
+import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.view.main.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,18 +31,17 @@ class DisposeTestService : Service() {
         const val ONGOING_NOTIFICATION_ID = 1
     }
 
-    private val db: MemberDatabase by inject()
+    private val dataStore: MemberLocalDataStore by inject()
 
     override fun onStart(intent: Intent?, startId: Int) {
         Log.d("ObserveRoom", "DisposeTestService#onStart")
         setUpForegroundService()
-        val dao = db.memberDao()
         val random = Random()
         GlobalScope.launch(Dispatchers.Main) {
             repeat(10) {
                 delay(2000)
                 val number = random.nextInt(1000)
-                dao.update(Member(2, "W%03d".format(number), 2))
+                dataStore.update(Member(2, "W%03d".format(number), 2))
                 Log.d("ObserveRoom", "dao.update $it")
             }
             Log.d("ObserveRoom", "stopForeground")
