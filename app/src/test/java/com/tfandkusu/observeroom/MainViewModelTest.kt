@@ -59,7 +59,6 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onCreate() = runBlocking {
-        // もっとよい書き方がありそう
         coEvery {
             localDataStore.listMembersCoroutineFlow()
         } returns testFlow(
