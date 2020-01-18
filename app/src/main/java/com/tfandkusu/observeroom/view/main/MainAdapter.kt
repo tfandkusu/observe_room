@@ -5,9 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.TransitionManager
 import com.tfandkusu.observeroom.R
 
 class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    val itemRoot = itemView.findViewById<ViewGroup>(R.id.item_root)
 
     val divisionView = itemView.findViewById<TextView>(R.id.division)
 
@@ -44,7 +47,14 @@ class MainAdapter(private val listener: Listener) : RecyclerView.Adapter<MainVie
         holder.divisionView.text = item.divisionName
         holder.memberView.text = item.memberName
         holder.itemView.setOnClickListener {
-            listener.onItemClick(item)
+            TransitionManager.beginDelayedTransition(holder.itemRoot)
+            // listener.onItemClick(item)
+            var text = ""
+            for (i in 0 until 10) {
+                text += item.memberName + " $i\n"
+            }
+            holder.memberView.text = text
+            
         }
     }
 }
