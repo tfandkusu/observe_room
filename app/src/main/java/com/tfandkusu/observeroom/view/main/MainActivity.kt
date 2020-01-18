@@ -51,7 +51,9 @@ class MainActivity : AppCompatActivity() {
         list.setHasFixedSize(true)
         viewModel.items.observe(this, Observer { items ->
             adapter.update(items.map {
-                MemberGroupieItem(it)
+                MemberGroupieItem(it) {
+                    callEditActivity(it)
+                }
             })
         })
         // スクロール位置の設定
