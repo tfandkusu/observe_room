@@ -95,15 +95,17 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                         if (firstTime) {
                             // 最初の1回だけ実行する
                             firstTime = false
-                            val flow = localDataStore.listMembersCoroutineFlow()
-                            flow.collect {
-                                items.value = it.map { src ->
+                            val flow = localDataStore.listMembersCoroutineFlow().map { list ->
+                                list.map {
                                     MemberListItem(
-                                        src.member.id,
-                                        src.member.name,
-                                        src.division.name
+                                        it.member.id,
+                                        it.member.name,
+                                        it.division.name
                                     )
                                 }
+                            }
+                            flow.collect {
+                                items.value = it
                                 // 読み込み完了
                                 progress.value = false
                                 Log.d("ObserveRoom", "flow.collect")
