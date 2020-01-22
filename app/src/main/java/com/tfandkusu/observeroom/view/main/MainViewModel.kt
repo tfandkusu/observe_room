@@ -9,6 +9,7 @@ import com.tfandkusu.observeroom.util.SingleLiveEvent
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -33,12 +34,18 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
 
     var mode = ObserveMode.COROUTINE_FLOW
 
+    /**
+     * 保存されたスクロール位置
+     */
+    var savedScroll = 0
+
     val items = MutableLiveData<List<MemberListItem>>()
 
     val progress = MutableLiveData<Boolean>()
 
     var disposable: Disposable? = null
 
+    var firstTime = true
 
     /**
      * スクロール位置制御
@@ -49,7 +56,7 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
         progress.value = true
     }
 
-    fun onCreate(lifecycleOwner: LifecycleOwner, savedScroll: Int?) =
+    fun onCreate(lifecycleOwner: LifecycleOwner, savedScroll: Int) =
         viewModelScope.launch(Dispatchers.Main) {
             // 初期データを書き込む
             localDataStore.makeFixture()
@@ -57,46 +64,52 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
             when (mode) {
                 ObserveMode.COROUTINE_FLOW -> {
                     if (true) {
-                        // Coroutine Flowで監視 + スクロール位置を更新された項目の位置にする
-                        val flow = localDataStore.listMembersCoroutineFlow()
-                        flow.collect {
-                            val oldList = items.value ?: listOf()
-                            val newList = it.map { src ->
-                                MemberListItem(
-                                    src.member.id,
-                                    src.member.name,
-                                    src.division.name
-                                )
+                        this@MainViewModel.savedScroll = savedScroll
+                        if (firstTime) {
+                            // 最初の1回だけ実行する
+                            firstTime = false
+                            // Coroutine Flowで監視
+                            val flow = localDataStore.listMembersCoroutineFlow().map { list ->
+                                list.map {
+                                    MemberListItem(
+                                        it.member.id,
+                                        it.member.name,
+                                        it.division.name
+                                    )
+                                }
                             }
-                            items.value = newList
-                            // 読み込み完了
-                            progress.value = false
-                            // スクロール位置復帰
-                            savedScroll?.let { index ->
-                                scroll.value = index
-                                Log.d("ObserveRoom", "scroll.value = $index")
+                            flow.collect {
+                                val oldList = items.value ?: listOf()
+                                val newList = it
+                                items.value = newList
+                                // 読み込み完了
+                                progress.value = false
+                                // 編集が行われた時はその場所にスクロールする
+                                updateScroll(oldList, newList)
+                                Log.d("ObserveRoom", "flow.collect")
                             }
-                            // 編集が行われた時はその場所にスクロールする
-                            updateScroll(oldList, newList)
-                            Log.d("ObserveRoom", "flow.collect")
                         }
                         // ここは実行されない
                     } else {
                         // Coroutine Flowで監視
-                        val flow = localDataStore.listMembersCoroutineFlow()
-                        flow.collect {
-                            items.value = it.map { src ->
-                                MemberListItem(
-                                    src.member.id,
-                                    src.member.name,
-                                    src.division.name
-                                )
+                        if (firstTime) {
+                            // 最初の1回だけ実行する
+                            firstTime = false
+                            val flow = localDataStore.listMembersCoroutineFlow()
+                            flow.collect {
+                                items.value = it.map { src ->
+                                    MemberListItem(
+                                        src.member.id,
+                                        src.member.name,
+                                        src.division.name
+                                    )
+                                }
+                                // 読み込み完了
+                                progress.value = false
+                                Log.d("ObserveRoom", "flow.collect")
                             }
-                            // 読み込み完了
-                            progress.value = false
-                            Log.d("ObserveRoom", "flow.collect")
+                            // ここは実行されない
                         }
-                        // ここは実行されない
                     }
                 }
                 ObserveMode.RX_JAVA -> {
@@ -148,8 +161,17 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
      * スクロール位置を更新された場所にする
      */
     private fun updateScroll(oldList: List<MemberListItem>, newList: List<MemberListItem>) {
-        if (oldList.isEmpty())
+        if (savedScroll >= 1) {
+            // 回転またはプロセスキルからの復帰ケース
+            scroll.value = savedScroll
+            savedScroll = 0
             return
+        }
+        if (oldList.isEmpty()) {
+            // 初回ケース
+            return
+        }
+        // 更新ケース
         // idのマップにする
         val map = LongSparseArray<MemberListItem>()
         oldList.map { map[it.id] = it }
@@ -163,7 +185,8 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
             }
         }
         Log.d("ObserveRoom", "scroll.value = $scrollIndex")
-        if (scrollIndex >= 0)
+        if (scrollIndex >= 0) {
             scroll.value = scrollIndex
+        }
     }
 }
