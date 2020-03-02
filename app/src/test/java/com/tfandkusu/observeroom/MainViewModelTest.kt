@@ -74,7 +74,7 @@ class MainViewModelTest {
             )
         )
         viewModel.progress.value shouldBe true
-        viewModel.onCreate(lifecycleOwner, null).join()
+        viewModel.onCreate(lifecycleOwner, 0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -114,7 +114,7 @@ class MainViewModelTest {
             MemberListItem(1L, "name1", "Sales"),
             MemberListItem(3L, "name2", "Development")
         )
-        viewModel.onCreate(lifecycleOwner, null).join()
+        viewModel.onCreate(lifecycleOwner, 0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -184,7 +184,7 @@ class MainViewModelTest {
         // RxJava版を使う
         viewModel.mode = ObserveMode.RX_JAVA
         viewModel.progress.value shouldBe true
-        viewModel.onCreate(lifecycleOwner, null).join()
+        viewModel.onCreate(lifecycleOwner, 0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -223,7 +223,7 @@ class MainViewModelTest {
             registry.currentState = Lifecycle.State.RESUMED
             viewModel.mode = ObserveMode.LIVE_DATA
             viewModel.progress.value shouldBe true
-            viewModel.onCreate(lifecycleOwner, null).join()
+            viewModel.onCreate(lifecycleOwner, 0).join()
             // リストが更新された
             viewModel.items.value?.get(0)?.id shouldBe 1L
             viewModel.items.value?.get(0)?.memberName shouldBe "name1"
