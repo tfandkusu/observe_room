@@ -41,12 +41,6 @@ class MainActivity : AppCompatActivity() {
         // RecyclerViewの設定
         val adapter = GroupAdapter<ViewHolder<*>>()
         list.adapter = adapter
-//        val adapter = MainAdapter(object : MainAdapter.Listener {
-//            override fun onItemClick(item: MemberListItem) {
-//                callEditActivity(item)
-//            }
-//        })
-//        list.adapter = adapter
         list.layoutManager = LinearLayoutManager(this)
         list.setHasFixedSize(true)
         viewModel.items.observe(this, Observer { items ->
