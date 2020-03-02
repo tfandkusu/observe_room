@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.databinding.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -37,20 +39,16 @@ class MainActivity : AppCompatActivity() {
             }
         })
         // RecyclerViewの設定
-        val adapter = MainAdapter(object : MainAdapter.Listener {
-            override fun onItemClick(item: MemberListItem) {
-                callEditActivity(item)
-            }
-        })
+        val adapter = GroupAdapter<ViewHolder<*>>()
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(this)
         list.setHasFixedSize(true)
         viewModel.items.observe(this, Observer { items ->
-            items?.let {
-                adapter.items.clear()
-                adapter.items.addAll(it)
-                adapter.notifyDataSetChanged()
-            }
+            adapter.update(items.map {
+                MemberGroupieItem(it) {
+                    callEditActivity(it)
+                }
+            })
         })
         // スクロール位置の設定
         viewModel.scroll.observe(this, Observer { index ->

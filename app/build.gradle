@@ -30,6 +30,9 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+    dataBinding {
+        enabled = true
+    }
 }
 
 def lifecycle_version = "2.1.0"
@@ -48,6 +51,9 @@ dependencies {
 
     // RecyclerView
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    // groupie (バージョンはDroidKaigi/conference-app-2020に合わせた)
+    implementation "com.xwray:groupie:2.4.0-alpha1"
+    implementation "com.xwray:groupie-databinding:2.4.0-alpha1"
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
