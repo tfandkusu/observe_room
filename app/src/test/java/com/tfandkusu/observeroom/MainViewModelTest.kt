@@ -5,7 +5,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.MutableLiveData
-import com.tfandkusu.observeroom.datastore.Division
+import com.tfandkusu.observeroom.data.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision
@@ -215,7 +215,10 @@ class MainViewModelTest {
                     ),
                     MemberWithDivision(
                         Member(3L, "name2", 4L),
-                        Division(4L, "Development")
+                        Division(
+                            4L,
+                            "Development"
+                        )
                     )
                 )
             )

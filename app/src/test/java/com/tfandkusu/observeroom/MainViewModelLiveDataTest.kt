@@ -2,7 +2,7 @@ package com.tfandkusu.observeroom
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.tfandkusu.observeroom.datastore.Division
+import com.tfandkusu.observeroom.data.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision

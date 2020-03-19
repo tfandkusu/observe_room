@@ -1,4 +1,4 @@
-package com.tfandkusu.observeroom.datastore
+package com.tfandkusu.observeroom.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

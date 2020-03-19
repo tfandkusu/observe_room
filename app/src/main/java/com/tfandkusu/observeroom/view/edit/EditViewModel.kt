@@ -2,7 +2,7 @@ package com.tfandkusu.observeroom.view.edit
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.tfandkusu.observeroom.datastore.Division
+import com.tfandkusu.observeroom.data.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent

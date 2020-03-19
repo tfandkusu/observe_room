@@ -3,6 +3,7 @@ package com.tfandkusu.observeroom.datastore
 import androidx.lifecycle.LiveData
 import androidx.room.withTransaction
 import com.mooveit.library.Fakeit
+import com.tfandkusu.observeroom.data.Division
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -59,9 +60,24 @@ class MemberLocalDataStoreImpl(private val db: MemberDatabase) : MemberLocalData
                 // 5部署作る
                 dao.insert(Division(0, "Sales"))
                 dao.insert(Division(0, "Support"))
-                dao.insert(Division(0, "Marketing"))
-                dao.insert(Division(0, "Development"))
-                dao.insert(Division(0, "Management"))
+                dao.insert(
+                    Division(
+                        0,
+                        "Marketing"
+                    )
+                )
+                dao.insert(
+                    Division(
+                        0,
+                        "Development"
+                    )
+                )
+                dao.insert(
+                    Division(
+                        0,
+                        "Management"
+                    )
+                )
                 Fakeit.init()
                 // 1部署5人
                 dao.listDivisions().map {

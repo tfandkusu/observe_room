@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.tfandkusu.observeroom.data.Division
 import io.reactivex.Flowable
 import kotlinx.coroutines.flow.Flow
 

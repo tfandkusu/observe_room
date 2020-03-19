@@ -1,7 +1,7 @@
 package com.tfandkusu.observeroom
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.tfandkusu.observeroom.datastore.Division
+import com.tfandkusu.observeroom.data.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision
@@ -46,10 +46,16 @@ class EditViewModelTest {
     fun onCreateInit() = runBlocking {
         coEvery {
             localDataStore.listDivisions()
-        } returns listOf(Division(1L, "Sales"), Division(2L, "Support"))
+        } returns listOf(
+            Division(1L, "Sales"),
+            Division(2L, "Support")
+        )
         coEvery {
             localDataStore.get(3L)
-        } returns MemberWithDivision(Member(3L, "Name3", 1L), Division(1L, "Sales"))
+        } returns MemberWithDivision(
+            Member(3L, "Name3", 1L),
+            Division(1L, "Sales")
+        )
         viewModel.progress.value shouldBe true
         viewModel.onCreate(3L).join()
         viewModel.divisions.value?.divisions shouldBe listOf(
@@ -73,10 +79,16 @@ class EditViewModelTest {
         viewModel.name.value = "Edited"
         coEvery {
             localDataStore.listDivisions()
-        } returns listOf(Division(1L, "Sales"), Division(2L, "Support"))
+        } returns listOf(
+            Division(1L, "Sales"),
+            Division(2L, "Support")
+        )
         coEvery {
             localDataStore.get(3L)
-        } returns MemberWithDivision(Member(3L, "Name3", 1L), Division(1L, "Sales"))
+        } returns MemberWithDivision(
+            Member(3L, "Name3", 1L),
+            Division(1L, "Sales")
+        )
         viewModel.progress.value shouldBe true
         viewModel.onCreate(3L).join()
         viewModel.divisions.value?.divisions shouldBe listOf(
