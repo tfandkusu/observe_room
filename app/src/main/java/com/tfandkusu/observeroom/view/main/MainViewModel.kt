@@ -30,6 +30,27 @@ enum class ObserveMode {
     LIVE_DATA
 }
 
+
+/**
+ * 画像URL一覧(いらすとやさん)
+ */
+val IMAGE_URLS = listOf(
+    "https://1.bp.blogspot.com/-wBekCTt7lFk/WDASNNQVR8I/AAAAAAAA_6Q/xBlpUKQaSfUEGV7QF2Qcf4lM3PdAYkoNACLcB/s180-c/syukatsu_jiko_appeal_man.png",
+    "https://3.bp.blogspot.com/-f7uCoB2z8w4/WBsAHD2t2vI/AAAAAAAA_SY/KAd2OTMCbZ86Kpt_8tCVG2SG9NQBdzlqgCLcB/s180-c/businesswoman5_ureshii.png",
+    "https://4.bp.blogspot.com/-w28GEx3_N-c/WASJRBDHo1I/AAAAAAAA_B0/DK820EOiWcwHx4qh0rvDtJ2J5wcIgD38gCLcB/s180-c/pose_douzo_annai_businesswoman.png",
+    "https://2.bp.blogspot.com/-LoPwcsgNHpY/WASJRIyrEtI/AAAAAAAA_B4/nYyIB1PE_9Uu9RP2tcv4Hdd-FCkM34RRgCLcB/s180-c/pose_douzo_annai_businessman.png",
+    "https://2.bp.blogspot.com/-kre7-857pXQ/Vvpd_CxppUI/AAAAAAAA5TI/3Y__uyCl1uoFOllDQxcjoHCfcBvkErA3Q/s180-c/ue_mezasu_woman.png",
+    "https://2.bp.blogspot.com/-pxJY0w5D5yA/Vvpd-IX0BMI/AAAAAAAA5TE/ShzBsF_c8AYmxwVNmcdJwlt4_6y301yAQ/s180-c/ue_mezasu_man.png",
+    "https://2.bp.blogspot.com/-imuC9F047vg/VnE4E2F1pgI/AAAAAAAA18o/q1RtMirslQg/s180-c/pose_genki10_businesswoman.png",
+    "https://4.bp.blogspot.com/-e-niajZaCVA/VnE4Ddpd0NI/AAAAAAAA18g/ENxtJx7Ej6I/s180-c/pose_genki09_businessman.png",
+    "https://2.bp.blogspot.com/-frz2gd8ClD0/VnE3TZBcPSI/AAAAAAAA10Y/3dbKXH2OMPU/s180-c/pose_makasenasai_woman.png",
+    "https://2.bp.blogspot.com/-1mLjLjlWnMk/ViipNaBhgFI/AAAAAAAAzys/k-1Gdd3zMWA/s180-c/business_suit_good_woman.png",
+    "https://4.bp.blogspot.com/-02hTJqtLKic/VhB9jqbjsVI/AAAAAAAAyzo/eY_8lITc36Q/s180-c/businessman_dekiru_woman.png",
+    "https://1.bp.blogspot.com/-rBFzjQbEFj4/VhB9jvnHAmI/AAAAAAAAyzs/R1Dwa7c5l78/s180-c/businessman_dekiru.png",
+    "https://4.bp.blogspot.com/-2SF2PLLFwi4/VfS6hXoS6yI/AAAAAAAAxRc/MhwXwHHQAW8/s180-c/mokuhyou_tassei_woman.png"
+)
+
+
 class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel() {
 
     var mode = ObserveMode.COROUTINE_FLOW
@@ -56,6 +77,7 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
         progress.value = true
     }
 
+
     fun onCreate(lifecycleOwner: LifecycleOwner, savedScroll: Int) =
         viewModelScope.launch(Dispatchers.Main) {
             // 初期データを書き込む
@@ -70,11 +92,12 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                             firstTime = false
                             // Coroutine Flowで監視
                             val flow = localDataStore.listMembersCoroutineFlow().map { list ->
-                                list.map {
+                                list.mapIndexed { index, item ->
                                     MemberListItem(
-                                        it.member.id,
-                                        it.member.name,
-                                        it.division.name
+                                        item.member.id,
+                                        item.member.name,
+                                        item.division.name,
+                                        IMAGE_URLS[index % IMAGE_URLS.size]
                                     )
                                 }
                             }
@@ -96,11 +119,12 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                             // 最初の1回だけ実行する
                             firstTime = false
                             val flow = localDataStore.listMembersCoroutineFlow().map { list ->
-                                list.map {
+                                list.mapIndexed { index, item ->
                                     MemberListItem(
-                                        it.member.id,
-                                        it.member.name,
-                                        it.division.name
+                                        item.member.id,
+                                        item.member.name,
+                                        item.division.name,
+                                        IMAGE_URLS[index % IMAGE_URLS.size]
                                     )
                                 }
                             }
@@ -119,11 +143,12 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                     if (disposable == null) {
                         val flowable = localDataStore.listMembersRxFlowable()
                         disposable = flowable.subscribe({
-                            items.value = it.map { src ->
+                            items.value = it.mapIndexed { index, item ->
                                 MemberListItem(
-                                    src.member.id,
-                                    src.member.name,
-                                    src.division.name
+                                    item.member.id,
+                                    item.member.name,
+                                    item.division.name,
+                                    IMAGE_URLS[index % IMAGE_URLS.size]
                                 )
                             }
                             // 読み込み完了
@@ -139,11 +164,12 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                     val liveData = localDataStore.listMembersLiveData()
                     liveData.observe(lifecycleOwner, Observer { src ->
                         src?.let {
-                            items.value = it.map { srcItem ->
+                            items.value = it.mapIndexed { index, item ->
                                 MemberListItem(
-                                    srcItem.member.id,
-                                    srcItem.member.name,
-                                    srcItem.division.name
+                                    item.member.id,
+                                    item.member.name,
+                                    item.division.name,
+                                    IMAGE_URLS[index % IMAGE_URLS.size]
                                 )
                             }
                         }

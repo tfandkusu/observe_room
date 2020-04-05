@@ -19,11 +19,12 @@ class MainViewModelLiveData(localDataStore: MemberLocalDataStore) : ViewModel() 
     val items = Transformations.map(localDataStore.listMembersLiveData()) { src ->
         // プログレス表示を消去
         progress.value = false
-        src.map {
+        src.mapIndexed { index, item ->
             MemberListItem(
-                it.member.id,
-                it.member.name,
-                it.division.name
+                item.member.id,
+                item.member.name,
+                item.division.name,
+                IMAGE_URLS[index % IMAGE_URLS.size]
             )
         }
     }

@@ -111,8 +111,8 @@ class MainViewModelTest {
         // 戻ってくる前の状態
         viewModel.progress.value = false
         viewModel.items.value = listOf(
-            MemberListItem(1L, "name1", "Sales"),
-            MemberListItem(3L, "name2", "Development")
+            MemberListItem(1L, "name1", "Sales", "https://example.com/image1.jpg"),
+            MemberListItem(3L, "name2", "Development", "https://example.com/image2.jpg")
         )
         viewModel.onCreate(lifecycleOwner, 0).join()
         // リストが更新された
@@ -122,6 +122,7 @@ class MainViewModelTest {
         viewModel.items.value?.get(1)?.id shouldBe 3L
         viewModel.items.value?.get(1)?.memberName shouldBe "edited"
         viewModel.items.value?.get(1)?.divisionName shouldBe "Management"
+        // Coilの動作確認なので、imageUrlは確認しない
         // スクロールは制御
         viewModel.scroll.value shouldBe 1
     }
