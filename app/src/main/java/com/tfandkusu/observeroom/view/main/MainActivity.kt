@@ -11,7 +11,7 @@ import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
 import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.databinding.ViewHolder
+import com.xwray.groupie.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         // RecyclerViewの設定
-        val adapter = GroupAdapter<ViewHolder<*>>()
+        val adapter = GroupAdapter<GroupieViewHolder>()
         list.adapter = adapter
         list.layoutManager = LinearLayoutManager(this)
         list.setHasFixedSize(true)

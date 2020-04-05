@@ -12,6 +12,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
@@ -30,6 +31,7 @@ class EditViewModelTest {
 
     private lateinit var viewModel: EditViewModel
 
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         // スレッドを切り替えない
