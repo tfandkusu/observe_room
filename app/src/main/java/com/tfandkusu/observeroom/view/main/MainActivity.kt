@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
-import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
@@ -71,15 +70,15 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) {
-            // Roomの購読解除が適切にされているかフォアグランドサービスで確認する
-            Log.d("ObserveRoom", "onDestroy")
-            val intent = Intent(this, DisposeTestService::class.java)
-            startService(intent)
-        }
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        if (isFinishing) {
+//            // Roomの購読解除が適切にされているかフォアグランドサービスで確認する
+//            Log.d("ObserveRoom", "onDestroy")
+//            val intent = Intent(this, DisposeTestService::class.java)
+//            startService(intent)
+//        }
+//    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d("ObserveRoom", "onSaveInstanceState")
