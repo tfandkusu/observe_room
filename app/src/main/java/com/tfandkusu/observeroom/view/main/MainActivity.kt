@@ -73,7 +73,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (isFinishing) {
+        @Suppress("SimplifyBooleanWithConstants")
+        if (isFinishing && false) {
             // Roomの購読解除が適切にされているかフォアグランドサービスで確認する
             Log.d("ObserveRoom", "onDestroy")
             val intent = Intent(this, DisposeTestService::class.java)
