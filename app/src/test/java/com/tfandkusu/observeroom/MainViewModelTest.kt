@@ -21,6 +21,7 @@ import io.reactivex.Flowable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
@@ -61,18 +62,20 @@ class MainViewModelTest {
     fun onCreate() = runBlocking {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
-        } returns testFlow(
-            listOf(
-                MemberWithDivision(
-                    Member(1L, "name1", 2L),
-                    Division(2L, "Sales")
-                ),
-                MemberWithDivision(
-                    Member(3L, "name2", 4L),
-                    Division(4L, "Development")
+        } returns flow {
+            emit(
+                listOf(
+                    MemberWithDivision(
+                        Member(1L, "name1", 2L),
+                        Division(2L, "Sales")
+                    ),
+                    MemberWithDivision(
+                        Member(3L, "name2", 4L),
+                        Division(4L, "Development")
+                    )
                 )
             )
-        )
+        }
         viewModel.progress.value shouldBe true
         viewModel.onCreate(lifecycleOwner, 0).join()
         // リストが更新された
@@ -96,18 +99,20 @@ class MainViewModelTest {
     fun onResultEdit() = runBlocking {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
-        } returns testFlow(
-            listOf(
-                MemberWithDivision(
-                    Member(1L, "name1", 2L),
-                    Division(2L, "Sales")
-                ),
-                MemberWithDivision(
-                    Member(3L, "edited", 4L),
-                    Division(5L, "Management")
+        } returns flow {
+            emit(
+                listOf(
+                    MemberWithDivision(
+                        Member(1L, "name1", 2L),
+                        Division(2L, "Sales")
+                    ),
+                    MemberWithDivision(
+                        Member(3L, "edited", 4L),
+                        Division(5L, "Management")
+                    )
                 )
             )
-        )
+        }
         // 戻ってくる前の状態
         viewModel.progress.value = false
         viewModel.items.value = listOf(
@@ -134,18 +139,20 @@ class MainViewModelTest {
     fun onCreateRestart() = runBlocking {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
-        } returns testFlow(
-            listOf(
-                MemberWithDivision(
-                    Member(1L, "name1", 2L),
-                    Division(2L, "Sales")
-                ),
-                MemberWithDivision(
-                    Member(3L, "name2", 4L),
-                    Division(4L, "Development")
+        } returns flow {
+            emit(
+                listOf(
+                    MemberWithDivision(
+                        Member(1L, "name1", 2L),
+                        Division(2L, "Sales")
+                    ),
+                    MemberWithDivision(
+                        Member(3L, "name2", 4L),
+                        Division(4L, "Development")
+                    )
                 )
             )
-        )
+        }
         viewModel.progress.value shouldBe true
         viewModel.onCreate(lifecycleOwner, 1).join()
         // リストが更新された
