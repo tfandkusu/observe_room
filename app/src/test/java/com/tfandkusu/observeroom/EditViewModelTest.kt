@@ -13,9 +13,9 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
@@ -56,8 +56,9 @@ class EditViewModelTest {
     /**
      * 初回ケース
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun onCreateInit() = runBlocking {
+    fun onCreateInit() = testDispatcher.runBlockingTest {
         coEvery {
             localDataStore.listDivisions()
         } returns listOf(Division(1L, "Sales"), Division(2L, "Support"))
@@ -80,8 +81,9 @@ class EditViewModelTest {
     /**
      * 画面回転、プロセス復帰ケース
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun onCreateRestore() = runBlocking {
+    fun onCreateRestore() = testDispatcher.runBlockingTest {
         // SavedInstanceStateから復帰
         viewModel.selectedDivisionId = 2L
         viewModel.name.value = "Edited"
@@ -106,8 +108,9 @@ class EditViewModelTest {
     /**
      * 保存する
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun save() = runBlocking {
+    fun save() = testDispatcher.runBlockingTest {
         viewModel.progress.value = false
         viewModel.save(1L, "Edited", 2L).join()
         coVerify(exactly = 1) {
