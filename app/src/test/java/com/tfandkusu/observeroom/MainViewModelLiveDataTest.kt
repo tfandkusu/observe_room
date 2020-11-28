@@ -33,9 +33,10 @@ class MainViewModelLiveDataTest {
 
     @Test
     fun test() {
+        // LiveDataを返却するモック実装を作る
         every {
             localDataStore.listMembersLiveData()
-        } returns MutableLiveData<List<MemberWithDivision>>(
+        } returns MutableLiveData(
             listOf(
                 MemberWithDivision(
                     Member(1L, "name1", 2L),
@@ -49,10 +50,10 @@ class MainViewModelLiveDataTest {
         )
         // テスト対象を作る
         val viewModel = MainViewModelLiveData(localDataStore)
+        // LiveDataの値を取得する
         val items = LiveDataTestUtil.getValue(viewModel.items)
         val progress = LiveDataTestUtil.getValue(viewModel.progress)
-        // リストが更新された
-        // valueがnullになる
+        // 値を確認する
         items[0].id shouldBe 1L
         items[0].memberName shouldBe "name1"
         items[0].divisionName shouldBe "Sales"
