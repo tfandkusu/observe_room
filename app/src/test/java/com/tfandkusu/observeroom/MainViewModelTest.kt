@@ -1,10 +1,6 @@
 package com.tfandkusu.observeroom
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.MutableLiveData
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
@@ -14,7 +10,6 @@ import com.tfandkusu.observeroom.view.main.MemberListItem
 import com.tfandkusu.observeroom.view.main.ObserveMode
 import io.kotlintest.shouldBe
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.reactivex.Flowable
@@ -48,10 +43,6 @@ class MainViewModelTest {
     @MockK(relaxed = true)
     lateinit var localDataStore: MemberLocalDataStore
 
-    @MockK(relaxed = true)
-    lateinit var lifecycleOwner: LifecycleOwner
-
-
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
@@ -74,7 +65,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onCreate() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -91,7 +82,7 @@ class MainViewModelTest {
             )
         }
         viewModel.progress.value shouldBe true
-        viewModel.onCreate(lifecycleOwner, 0).join()
+        viewModel.onCreate(0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -112,7 +103,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onResultEdit() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -134,7 +125,7 @@ class MainViewModelTest {
             MemberListItem(1L, "name1", "Sales"),
             MemberListItem(3L, "name2", "Development")
         )
-        viewModel.onCreate(lifecycleOwner, 0).join()
+        viewModel.onCreate(0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -153,7 +144,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onCreateRestart() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -170,7 +161,7 @@ class MainViewModelTest {
             )
         }
         viewModel.progress.value shouldBe true
-        viewModel.onCreate(lifecycleOwner, 1).join()
+        viewModel.onCreate(1).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -208,7 +199,7 @@ class MainViewModelTest {
         // RxJava版を使う
         viewModel.mode = ObserveMode.RX_JAVA
         viewModel.progress.value shouldBe true
-        viewModel.onCreate(lifecycleOwner, 0).join()
+        viewModel.onCreate(0).join()
         // リストが更新された
         viewModel.items.value?.get(0)?.id shouldBe 1L
         viewModel.items.value?.get(0)?.memberName shouldBe "name1"
@@ -220,46 +211,5 @@ class MainViewModelTest {
         viewModel.progress.value shouldBe false
         // スクロールは特に制御しない
         viewModel.scroll.value shouldBe null
-    }
-
-    /**
-     * LiveData版のテスト
-     */
-    @ExperimentalCoroutinesApi
-    @Test
-    fun onCreateLiveData() = testDispatcher.runBlockingTest {
-        // このテストはうまくいかなかった
-        if (false) {
-            every {
-                localDataStore.listMembersLiveData()
-            } returns MutableLiveData<List<MemberWithDivision>>(
-                listOf(
-                    MemberWithDivision(
-                        Member(1L, "name1", 2L),
-                        Division(2L, "Sales")
-                    ),
-                    MemberWithDivision(
-                        Member(3L, "name2", 4L),
-                        Division(4L, "Development")
-                    )
-                )
-            )
-            val registry = LifecycleRegistry(lifecycleOwner)
-            registry.currentState = Lifecycle.State.RESUMED
-            viewModel.mode = ObserveMode.LIVE_DATA
-            viewModel.progress.value shouldBe true
-            viewModel.onCreate(lifecycleOwner, 0).join()
-            // リストが更新された
-            viewModel.items.value?.get(0)?.id shouldBe 1L
-            viewModel.items.value?.get(0)?.memberName shouldBe "name1"
-            viewModel.items.value?.get(0)?.divisionName shouldBe "Sales"
-            viewModel.items.value?.get(1)?.id shouldBe 3L
-            viewModel.items.value?.get(1)?.memberName shouldBe "name2"
-            viewModel.items.value?.get(1)?.divisionName shouldBe "Development"
-            // プログレスが消えた
-            viewModel.progress.value shouldBe false
-            // スクロールは特に制御しない
-            viewModel.scroll.value shouldBe null
-        }
     }
 }
