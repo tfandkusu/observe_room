@@ -1,8 +1,9 @@
 package com.tfandkusu.observeroom.view.main
 
+import android.view.View
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.databinding.MemberGroupieItemBinding
-import com.xwray.groupie.databinding.BindableItem
+import com.xwray.groupie.viewbinding.BindableItem
 
 class MemberGroupieItem(private val item: MemberListItem, private val onClick: () -> Unit) :
     BindableItem<MemberGroupieItemBinding>(item.id) {
@@ -15,6 +16,10 @@ class MemberGroupieItem(private val item: MemberListItem, private val onClick: (
         viewBinding.root.setOnClickListener {
             onClick()
         }
+    }
+
+    override fun initializeViewBinding(view: View): MemberGroupieItemBinding {
+        return MemberGroupieItemBinding.bind(view)
     }
 
 }
