@@ -22,14 +22,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 
 class MainViewModelTest {
+
+    @ExperimentalCoroutinesApi
+    private val testDispatcher = TestCoroutineDispatcher()
+
     /**
      * LiveDataを書き換えるのに必要
      */
@@ -48,18 +55,25 @@ class MainViewModelTest {
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        // スレッドを切り替えない
-        Dispatchers.setMain(Dispatchers.Unconfined)
+        Dispatchers.setMain(testDispatcher)
         MockKAnnotations.init(this)
         viewModel = MainViewModel(localDataStore)
+    }
+
+    @ExperimentalCoroutinesApi
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        testDispatcher.cleanupTestCoroutines()
     }
 
     /**
      * 初回起動時の処理
      */
+    @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
     @Test
-    fun onCreate() = runBlocking {
+    fun onCreate() = testDispatcher.runBlockingTest {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
@@ -94,9 +108,10 @@ class MainViewModelTest {
     /**
      * 編集画面から戻ってきた時の処理
      */
+    @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
     @Test
-    fun onResultEdit() = runBlocking {
+    fun onResultEdit() = testDispatcher.runBlockingTest {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
@@ -134,9 +149,10 @@ class MainViewModelTest {
     /**
      * プロセス復帰時の処理
      */
+    @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
     @Test
-    fun onCreateRestart() = runBlocking {
+    fun onCreateRestart() = testDispatcher.runBlockingTest {
         coEvery {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
@@ -172,8 +188,9 @@ class MainViewModelTest {
     /**
      * RxJava版のテスト
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun onCreateRxJava() = runBlocking {
+    fun onCreateRxJava() = testDispatcher.runBlockingTest {
         every {
             localDataStore.listMembersRxFlowable()
         } returns Flowable.just(
@@ -208,8 +225,9 @@ class MainViewModelTest {
     /**
      * LiveData版のテスト
      */
+    @ExperimentalCoroutinesApi
     @Test
-    fun onCreateLiveData() = runBlocking {
+    fun onCreateLiveData() = testDispatcher.runBlockingTest {
         // このテストはうまくいかなかった
         if (false) {
             every {

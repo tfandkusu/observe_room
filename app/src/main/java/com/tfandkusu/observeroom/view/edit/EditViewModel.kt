@@ -2,12 +2,11 @@ package com.tfandkusu.observeroom.view.edit
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 
@@ -49,7 +48,7 @@ class EditViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
      * ActivityのonCreateから呼ぶ
      * @param id
      */
-    fun onCreate(id: Long) = GlobalScope.launch(Dispatchers.Main) {
+    fun onCreate(id: Long) = viewModelScope.launch {
         val divisionsList = localDataStore.listDivisions()
         val member = localDataStore.get(id)
         member?.let {
@@ -73,7 +72,7 @@ class EditViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
     /**
      * 編集内容を保存する
      */
-    fun save(id: Long, name: String, divisionId: Long) = GlobalScope.launch(Dispatchers.Main) {
+    fun save(id: Long, name: String, divisionId: Long) = viewModelScope.launch {
         progress.value = true
         val member = Member(id, name, divisionId)
         localDataStore.update(member)
