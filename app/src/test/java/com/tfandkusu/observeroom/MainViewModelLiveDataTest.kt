@@ -31,8 +31,11 @@ class MainViewModelLiveDataTest {
         MockKAnnotations.init(this)
     }
 
+    /**
+     * LiveData版のテスト
+     */
     @Test
-    fun test() {
+    fun liveData() {
         every {
             localDataStore.listMembersLiveData()
         } returns MutableLiveData<List<MemberWithDivision>>(
@@ -62,4 +65,6 @@ class MainViewModelLiveDataTest {
         // プログレスが消えた
         progress shouldBe false
     }
+
+
 }
