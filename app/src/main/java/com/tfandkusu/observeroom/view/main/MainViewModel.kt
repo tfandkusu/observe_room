@@ -5,6 +5,7 @@ import android.util.LongSparseArray
 import androidx.core.util.set
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
@@ -26,7 +27,12 @@ enum class ObserveMode {
     /**
      * RxJavaで監視
      */
-    RX_JAVA
+    RX_JAVA,
+
+    /**
+     * Coroutine FlowをasLiveDataでLiveDataに変換する
+     */
+    AS_LIVE_DATA
 }
 
 class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel() {
@@ -39,6 +45,19 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
     var savedScroll = 0
 
     val items = MutableLiveData<List<MemberListItem>>()
+
+    /**
+     * Coroutines FlowをLiveDataに変換する
+     */
+    val itemsAsLiveData = localDataStore.listMembersCoroutineFlow().map { memberWithDivisions ->
+        memberWithDivisions.map {
+            MemberListItem(
+                it.member.id,
+                it.member.name,
+                it.division.name
+            )
+        }
+    }.asLiveData()
 
     val progress = MutableLiveData<Boolean>()
 
@@ -132,6 +151,10 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                             it.printStackTrace()
                         })
                     }
+                }
+                else -> {
+                    progress.value = false
+                    // AS_LIVE_DATAモードではなにもしない
                 }
             }
         }

@@ -5,12 +5,12 @@ import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision
+import com.tfandkusu.observeroom.util.LiveDataTestUtil
 import com.tfandkusu.observeroom.view.main.MainViewModel
 import com.tfandkusu.observeroom.view.main.MemberListItem
 import com.tfandkusu.observeroom.view.main.ObserveMode
 import io.kotlintest.shouldBe
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.reactivex.Flowable
@@ -66,7 +66,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onCreate() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -104,7 +104,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onResultEdit() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -145,7 +145,7 @@ class MainViewModelTest {
     @InternalCoroutinesApi
     @Test
     fun onCreateRestart() = testDispatcher.runBlockingTest {
-        coEvery {
+        every {
             localDataStore.listMembersCoroutineFlow()
         } returns flow {
             emit(
@@ -214,4 +214,37 @@ class MainViewModelTest {
         viewModel.scroll.value shouldBe null
     }
 
+    /**
+     * asLiveData版のテスト
+     */
+    @Test
+    fun onCreateAsLiveData() {
+        every {
+            localDataStore.listMembersCoroutineFlow()
+        } returns flow {
+            emit(
+                listOf(
+                    MemberWithDivision(
+                        Member(1L, "name1", 2L),
+                        Division(2L, "Sales")
+                    ),
+                    MemberWithDivision(
+                        Member(3L, "name2", 4L),
+                        Division(4L, "Development")
+                    )
+                )
+            )
+        }
+        // 作成時に上記モックメソッドが実行されるので、ここでViewModelを作る必要がある。
+        val viewModel = MainViewModel(localDataStore)
+        // LiveDataから値を取得する
+        val items = LiveDataTestUtil.getValue(viewModel.itemsAsLiveData)
+        // 値を確認する
+        items[0].id shouldBe 1L
+        items[0].memberName shouldBe "name1"
+        items[0].divisionName shouldBe "Sales"
+        items[1].id shouldBe 3L
+        items[1].memberName shouldBe "name2"
+        items[1].divisionName shouldBe "Development"
+    }
 }
