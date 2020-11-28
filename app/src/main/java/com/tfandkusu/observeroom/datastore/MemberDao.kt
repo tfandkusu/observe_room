@@ -22,9 +22,6 @@ interface MemberDao {
     @Query("SELECT * FROM division ORDER BY id")
     suspend fun listDivisions(): List<Division>
 
-    @Query("SELECT * FROM member ORDER BY member.name")
-    suspend fun listMembers(): List<MemberWithDivision>
-
     @Query("SELECT * FROM member WHERE id=:id")
     suspend fun get(id: Long): MemberWithDivision?
 

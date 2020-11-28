@@ -35,7 +35,7 @@ interface MemberLocalDataStore {
     /**
      * メンバー一覧を取得(Coroutine Flow版)
      */
-    suspend fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>>
+    fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>>
 
     /**
      * メンバー一覧を取得(RxJava版)
@@ -84,7 +84,7 @@ class MemberLocalDataStoreImpl(private val db: MemberDatabase) : MemberLocalData
     }
 
 
-    override suspend fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>> {
+    override fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>> {
         return db.memberDao().listMembersCoroutineFlow()
     }
 
