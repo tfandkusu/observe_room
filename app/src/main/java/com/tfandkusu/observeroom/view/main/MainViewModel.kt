@@ -3,7 +3,9 @@ package com.tfandkusu.observeroom.view.main
 import android.util.Log
 import android.util.LongSparseArray
 import androidx.core.util.set
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.util.SingleLiveEvent
 import io.reactivex.disposables.Disposable
@@ -20,14 +22,11 @@ enum class ObserveMode {
      * Coroutine Flowで監視
      */
     COROUTINE_FLOW,
+
     /**
      * RxJavaで監視
      */
-    RX_JAVA,
-    /**
-     * LiveDataで監視
-     */
-    LIVE_DATA
+    RX_JAVA
 }
 
 class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewModel() {
@@ -56,7 +55,7 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
         progress.value = true
     }
 
-    fun onCreate(lifecycleOwner: LifecycleOwner, savedScroll: Int) =
+    fun onCreate(savedScroll: Int) =
         viewModelScope.launch(Dispatchers.Main) {
             // 初期データを書き込む
             localDataStore.makeFixture()
@@ -133,24 +132,6 @@ class MainViewModel(private val localDataStore: MemberLocalDataStore) : ViewMode
                             it.printStackTrace()
                         })
                     }
-                }
-                ObserveMode.LIVE_DATA -> {
-                    // LiveDataで監視
-                    val liveData = localDataStore.listMembersLiveData()
-                    liveData.observe(lifecycleOwner, Observer { src ->
-                        src?.let {
-                            items.value = it.map { srcItem ->
-                                MemberListItem(
-                                    srcItem.member.id,
-                                    srcItem.member.name,
-                                    srcItem.division.name
-                                )
-                            }
-                        }
-                        // 読み込み完了
-                        progress.value = false
-                        Log.d("ObserveRoom", "LiveData observer")
-                    })
                 }
             }
         }

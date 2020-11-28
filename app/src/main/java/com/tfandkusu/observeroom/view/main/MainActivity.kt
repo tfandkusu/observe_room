@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 list.scrollToPosition(it)
             }
         })
-        viewModel.onCreate(this, savedInstanceState?.getInt(EXTRA_SCROLL) ?: 0)
+        viewModel.onCreate(savedInstanceState?.getInt(EXTRA_SCROLL) ?: 0)
     }
 
     /**
