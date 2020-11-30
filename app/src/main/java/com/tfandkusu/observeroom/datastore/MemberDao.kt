@@ -28,7 +28,7 @@ interface MemberDao {
     @Update
     suspend fun update(member: Member)
 
-    @Query("SELECT * FROM member ORDER BY member.name")
+    @Query("SELECT * FROM member ORDER BY divisionId, name")
     fun listMembersCoroutineFlow(): Flow<List<MemberWithDivision>>
 
     @Query("SELECT * FROM member ORDER BY member.name")
