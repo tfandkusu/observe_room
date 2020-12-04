@@ -1,11 +1,11 @@
 package com.tfandkusu.observeroom
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.jraska.livedata.test
 import com.tfandkusu.observeroom.datastore.Division
 import com.tfandkusu.observeroom.datastore.Member
 import com.tfandkusu.observeroom.datastore.MemberLocalDataStore
 import com.tfandkusu.observeroom.datastore.MemberWithDivision
-import com.tfandkusu.observeroom.util.LiveDataTestUtil
 import com.tfandkusu.observeroom.view.main.MainViewModel
 import io.kotlintest.shouldBe
 import io.mockk.MockKAnnotations
@@ -74,7 +74,7 @@ class MainViewModelAsLiveDataTest {
         // テスト対象を作る
         val viewModel = MainViewModel(localDataStore)
         // LiveDataから値を取得する
-        val items = LiveDataTestUtil.getValue(viewModel.itemsAsLiveData)
+        val items = viewModel.itemsAsLiveData.test().awaitValue().value()
         // 値を確認する
         items[0].id shouldBe 1L
         items[0].memberName shouldBe "name1"
