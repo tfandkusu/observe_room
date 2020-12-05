@@ -84,5 +84,6 @@ dependencies {
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.3.2'
     // MockK
     testImplementation "io.mockk:mockk:1.10.2"
-
+    // LiveData Testing
+    testImplementation 'com.jraska.livedata:testing-ktx:1.1.2'
 }
