@@ -424,7 +424,7 @@ public class StickyHeadersLinearLayoutManager<T extends RecyclerView.Adapter & S
                 // おなじタグのViewが2個ある時は
                 for (View view : views) {
                     // 上にめり込んでいる方を非表示にする
-                    if (view.getY() < 0) {
+                    if (view.getTop() < 0) {
                         view.setVisibility(View.INVISIBLE);
                     }
                 }
