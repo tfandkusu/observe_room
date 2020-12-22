@@ -8,7 +8,15 @@ class MainController(private val onItemClick: (MemberListItem) -> Unit) :
 
     override
     fun buildModels(items: List<MemberListItem>) {
+        var lastDivision = ""
         items.forEach {
+            if (lastDivision != it.divisionName) {
+                division {
+                    id(it.divisionName)
+                    division(it.divisionName)
+                }
+                lastDivision = it.divisionName
+            }
             member {
                 id(it.id)
                 item(it)
