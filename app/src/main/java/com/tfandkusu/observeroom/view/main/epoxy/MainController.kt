@@ -26,4 +26,8 @@ class MainController(private val onItemClick: (MemberListItem) -> Unit) :
             }
         }
     }
+
+    override fun isStickyHeader(position: Int): Boolean {
+        return adapter.getModelAtPosition(position)::class == DivisionModel_::class
+    }
 }

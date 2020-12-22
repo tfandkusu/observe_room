@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.airbnb.epoxy.stickyheader.StickyHeaderLinearLayoutManager
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             callEditActivity(it)
         }
         list.adapter = controller.adapter
-        list.layoutManager = LinearLayoutManager(this)
+        list.layoutManager = StickyHeaderLinearLayoutManager(this)
         viewModel.items.observe(this) {
             controller.setData(it)
         }
