@@ -14,14 +14,18 @@ abstract class DivisionModel : EpoxyModelWithHolder<DivisionModel.Holder>() {
     lateinit var division: String
 
     override fun bind(holder: Holder) {
+        holder.root.tag = "header $division"
         holder.division.text = division
     }
 
     class Holder : EpoxyHolder() {
 
+        lateinit var root: View
+
         lateinit var division: TextView
 
         override fun bindView(itemView: View) {
+            root = itemView.rootView
             division = itemView.findViewById(R.id.division)
         }
     }
