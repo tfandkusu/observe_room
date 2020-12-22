@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tfandkusu.observeroom.R
 import com.tfandkusu.observeroom.view.disposetest.DisposeTestService
 import com.tfandkusu.observeroom.view.edit.EditActivity
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Group
+import io.doist.recyclerviewext.sticky_headers.StickyHeadersLinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -39,16 +39,23 @@ class MainActivity : AppCompatActivity() {
             }
         })
         // RecyclerViewの設定
-        val adapter = GroupAdapter<GroupieViewHolder>()
+        val adapter = StickyHeaderGroupAdapter()
         list.adapter = adapter
-        list.layoutManager = LinearLayoutManager(this)
+        list.layoutManager = StickyHeadersLinearLayoutManager<StickyHeaderGroupAdapter>(this)
         list.setHasFixedSize(true)
         viewModel.items.observe(this, Observer { items ->
-            adapter.update(items.map {
-                MemberGroupieItem(it) {
-                    callEditActivity(it)
+            var lastDivision = ""
+            val gis = mutableListOf<Group>()
+            items.map {
+                if (lastDivision != it.divisionName) {
+                    gis.add(DivisionGroupieItem(it.divisionName))
+                    lastDivision = it.divisionName
                 }
-            })
+                gis.add(MemberGroupieItem(it) {
+                    callEditActivity(it)
+                })
+            }
+            adapter.update(gis)
         })
         // スクロール位置の設定
         viewModel.scroll.observe(this, Observer { index ->
