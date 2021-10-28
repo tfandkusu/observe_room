@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.tfandkusu.observeroom.R
 import kotlinx.android.synthetic.main.activity_edit.*
-import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditActivity : AppCompatActivity() {
 
