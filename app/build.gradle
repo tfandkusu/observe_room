@@ -24,15 +24,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
     buildFeatures {
         viewBinding true
     }
     packagingOptions {
         exclude 'META-INF/LICENSE.md'
         exclude 'META-INF/LICENSE-notice.md'
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+        devices {
+            pixel (com.android.build.api.dsl.ManagedVirtualDevice) {
+                device = 'Pixel 2'
+                apiLevel = 30
+                systemImageSource = 'google'
+                abi = 'x86'
+            }
+        }
     }
 }
 
