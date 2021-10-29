@@ -1,7 +1,7 @@
 # 単体テスト実行を行うワークフロー
 
 # ワークフローの名前
-name: check
+name: instrumented_test
 # ワークフロー実行タイミングは
 on:
   # mainブランチへのPUSH
